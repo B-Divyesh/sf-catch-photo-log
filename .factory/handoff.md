@@ -4,7 +4,7 @@ Work order: `catch-photo-log-repair-2`
 
 Repaired base: `902467311002be26943ded75d21c269a7d963329`
 
-Repair implementation: `6b5a1f530bdb92b0313d328c6bbf3e3915fa8ee4`
+Repair commits: `6b5a1f530bdb92b0313d328c6bbf3e3915fa8ee4`, `4206bc3e2106ec13cbab116a7ff754defcca0ab9`, and `7752e6e`
 
 Completed: 2026-08-28
 
@@ -36,6 +36,15 @@ No independent verifier report was present in the checkout, `/work/.evidence`, G
 - Manifest check: standalone display, versioned start URL, 192/512 icons and a 512 maskable icon. Browser cache check found `catch-log-v3-shell` and `catch-log-v3-assets`.
 - Production bundle identity check: contains `https://api.sociobot.in`, contains no pilot billing origin, and uses product slug `catch-photo-log`.
 - Manual screenshots at 1366×900 and 390×844 show the product-specific blueprint field sheet without horizontal overflow or obscured controls.
+
+## Deployment evidence
+
+- Deployed the verified `dist/` artifact to Azure Static Web Apps resource `sf-catch-photo-log`; default host `proud-coast-03b58220f.7.azurestaticapps.net`.
+- The factory deploy script’s requested Standard SKU was rejected because the subscription’s Standard-site quota was full. The target did not previously exist, and the subscription had Free capacity, so the same static artifact/configuration was deployed as a new Free-tier Static Web App. No existing product resource was deleted or repurposed.
+- Created the requested DNS CNAME, completed Azure custom-domain validation and managed TLS, and confirmed `https://catch-photo-log.sociobot.in` is `Ready` and returns HTTP 200.
+- Final live factory verifier: 807 ms load; expected title and `Catch Photo Log` identity; one h1/main; zero missing alt attributes, unlabeled buttons, console errors, or page errors.
+- Live `/`, `/privacy`, `/terms`, `/manifest.webmanifest`, and `/sw.js` resolve from the deployed artifact. The manifest consistently returns `application/manifest+json`; the root serves CSP, Permissions-Policy, no-referrer, MIME-sniffing protection, and HSTS headers.
+- Live browser smoke: service worker controls the page; `/privacy` reloads while `context.setOffline(true)`; the bundle exposes only the production checkout URL; no pilot resource is loaded; zero browser errors.
 
 Evidence generated outside the repository is under `/work/.evidence/local-verify/` and `/work/.evidence/lighthouse/report.json` in the repair worker container.
 
