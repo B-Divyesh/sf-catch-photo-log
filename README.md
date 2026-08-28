@@ -36,13 +36,13 @@ The reproducible deploy command is `npm run build`. Static output lands in `dist
 
 ## Billing environments
 
-The staging build defaults to the factory’s test engine at `https://pilot-api.sociobot.in`. Release builds should set:
+The Vite development server defaults to the factory’s test engine at `https://pilot-api.sociobot.in`; production builds default to `https://api.sociobot.in`. Either can be overridden explicitly:
 
 ```sh
 VITE_BILLING_BASE_URL=https://api.sociobot.in npm run build
 ```
 
-The checkout and verification URLs use the product slug `catch-photo-log`; no provider or product ID is embedded. Sociobot/Dodo is the merchant of record.
+The checkout and verification URLs use the product slug `catch-photo-log`; no provider or product ID is embedded. Sociobot/Dodo is the merchant of record. The factory must enable that product in the selected billing environment before the buy link can accept purchases.
 
 ## Storage and backups
 
