@@ -9,6 +9,7 @@
   --grid: #c6dce0;
   --signal: #c54b1a;
   --signal-hover: #a93d12;
+  --signal-contrast: #fffdf6;
   --success: #21663d;
   --warning: #8a5a00;
   --danger: #a13630;
@@ -32,6 +33,7 @@
   --grid: #1e4857;
   --signal: #ff8c55;
   --signal-hover: #ffad86;
+  --signal-contrast: #071c27;
   --success: #7fcf96;
   --warning: #ffd37a;
   --danger: #ff9990;
@@ -77,8 +79,8 @@ main { max-width: 1440px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 64px) 80px
 .button { min-height: 48px; padding: 11px 18px; display: inline-flex; justify-content: center; align-items: center; gap: 20px; border: 1px solid var(--blueprint); background: var(--sheet); color: var(--ink); text-decoration: none; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .84rem; font-weight: 700; box-shadow: 3px 3px 0 var(--grid); transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease; }
 .button:hover { color: var(--ink); transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--grid); }
 .button:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--grid); }
-.button.primary { color: #fffdf6; border-color: var(--signal); background: var(--signal); box-shadow: 4px 4px 0 color-mix(in srgb, var(--signal), transparent 68%); }
-.button.primary:hover { color: #fffdf6; background: var(--signal-hover); }
+.button.primary { color: var(--signal-contrast); border-color: var(--signal); background: var(--signal); box-shadow: 4px 4px 0 color-mix(in srgb, var(--signal), transparent 68%); }
+.button.primary:hover { color: var(--signal-contrast); background: var(--signal-hover); }
 .button.secondary { background: transparent; }
 .button.quiet { border-color: transparent; box-shadow: none; background: transparent; color: var(--blueprint-strong); text-decoration: underline; }
 .button.danger { color: var(--sheet); background: var(--danger); border-color: var(--danger); }
@@ -208,7 +210,8 @@ dialog h2 { margin: 8px 0; font-size: 2rem; font-weight: 500; }
 .updated { margin-top: 48px; color: var(--muted); }
 
 @keyframes sheet-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Keep toast text fully opaque throughout motion so transient states retain WCAG contrast. */
+@keyframes toast-in { from { transform: translateY(10px); } to { transform: translateY(0); } }
 
 @media (max-width: 900px) {
   .hero { min-height: auto; grid-template-columns: 1fr; padding-top: 56px; }

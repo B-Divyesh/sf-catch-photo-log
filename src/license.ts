@@ -1,7 +1,8 @@
 const SLUG = 'catch-photo-log';
 const LICENSE_KEY = `sb_license:${SLUG}`;
 const VERDICT_KEY = `${LICENSE_KEY}:verdict`;
-const BILLING_BASE = import.meta.env.VITE_BILLING_BASE_URL || 'https://pilot-api.sociobot.in';
+const BILLING_BASE = import.meta.env.VITE_BILLING_BASE_URL
+  || (import.meta.env.DEV ? 'https://pilot-api.sociobot.in' : 'https://api.sociobot.in');
 const DAY = 86_400_000;
 
 interface Verdict { valid: boolean; checkedAt: number; reason?: string }

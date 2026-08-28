@@ -3,7 +3,7 @@
   "name": "Catch Photo Log",
   "short_name": "Catch Log",
   "description": "A private, offline photo-first fishing setup log.",
-  "start_url": "/?source=pwa&v=1",
+  "start_url": "/?source=pwa&v=2",
   "scope": "/",
   "display": "standalone",
   "background_color": "#F4F0E5",

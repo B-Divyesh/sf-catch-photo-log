@@ -2,7 +2,7 @@ import './style.css';
 import { listCatches, removeCatch, replaceAllCatches, saveCatch } from './db';
 import { catchesToCsv, createBackup, downloadText, parseBackup } from './export';
 import { readPhotoExif, roundCoordinate } from './exif';
-import { checkoutUrl, consumeLicenseFromUrl, hasOptimisticUnlock, storeLicense, verifyLicense } from './license';
+import { checkoutUrl, clearLicense, consumeLicenseFromUrl, hasOptimisticUnlock, storeLicense, verifyLicense } from './license';
 import { preparePhoto } from './photo';
 import type { CatchRecord, LocationMode, SetupPreset } from './types';
 
@@ -622,7 +622,12 @@ async function restoreLicense(event: SubmitEvent): Promise<void> {
     document.querySelector('#field-kit-copy')!.textContent = 'Your one-time unlock is active on this device.';
     renderFieldKit();
     showToast(verdict.reason === 'offline' ? 'License saved. It will be checked when online.' : 'Field Kit unlocked.');
-  } else message.textContent = 'That license is not active for Catch Photo Log. Check the token or buy Field Kit.';
+  } else {
+    clearLicense();
+    unlocked = false;
+    document.querySelector('#license-status')!.textContent = 'Free field sheet';
+    message.textContent = 'That license is not active for Catch Photo Log. Check the token or buy Field Kit.';
+  }
 }
 
 function showToast(message: string, action?: string, callback?: () => void): void {
@@ -651,6 +656,7 @@ async function start(): Promise<void> {
   if (localStorage.getItem('sb_license:catch-photo-log')) {
     const verdict = await verifyLicense();
     if (!verdict.valid) {
+      clearLicense();
       unlocked = false;
       renderApp();
       showToast('Your Field Kit license is no longer active. Free records and exports still work.');

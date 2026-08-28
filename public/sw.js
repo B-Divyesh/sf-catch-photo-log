@@ -1,4 +1,4 @@
-const VERSION = 'catch-log-v2';
+const VERSION = 'catch-log-v3';
 const ASSET_CACHE = `${VERSION}-assets`;
 const SHELL_CACHE = `${VERSION}-shell`;
 const SHELL = ['/', '/index.html', '/offline.html', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-maskable-512.png', '/assets/catch-blueprint-768.webp', '/assets/catch-blueprint-1280.webp'];

@@ -19,6 +19,7 @@ Light “field sheet” is the default. Dark “night chart” is selected from 
 | `--blueprint` | `#176B87` | `#69C6DC` | rules, links, focus |
 | `--grid` | `#C6DCE0` | `#1E4857` | drafting grid |
 | `--signal` | `#C54B1A` | `#FF8C55` | primary action / survey flag |
+| `--signal-contrast` | `#FFFDF6` | `#071C27` | legible primary-action label |
 | `--success` | `#21663D` | `#7FCF96` | saved / local |
 | `--warning` | `#8A5A00` | `#FFD37A` | offline / missing metadata |
 | `--danger` | `#A13630` | `#FF9990` | destructive actions |
