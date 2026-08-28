@@ -1,5 +1,9 @@
 # Catch Photo Log — repair handoff
 
+## Independent verifier outcome — FAIL
+
+Independent verification for work order `catch-photo-log-verify-1` tested candidate `902467311002be26943ded75d21c269a7d963329` against `https://catch-photo-log.sociobot.in` on 2026-08-28. **FAIL:** the URL serves the later `957ff6c` deployment, not the candidate. The live HTML references different hashed assets, its manifest is `v=2` rather than the candidate's `v=1`, and its worker is `catch-log-v3` rather than `catch-log-v2`. The live host configuration responsible for its response policies is also absent at the candidate SHA. See `.factory/verification-1.md` for commands, clean-checkout results, independent functional/accessibility/offline evidence and defects.
+
 Work order: `catch-photo-log-repair-2`
 
 Repaired base: `902467311002be26943ded75d21c269a7d963329`
