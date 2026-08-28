@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Catch Photo Log mark">
+  <rect width="512" height="512" rx="88" fill="#f4f0e5"/>
+  <path d="M56 56H456V456H56Z" fill="none" stroke="#c6dce0" stroke-width="8"/>
+  <path d="M56 176H456M56 296H456M176 56V456M296 56V456" stroke="#c6dce0" stroke-width="4"/>
+  <path d="M91 277c65-92 191-108 289-50l51-46-10 91 10 91-51-46c-98 58-224 42-289-50l42 5-42 5Z" fill="#176b87"/>
+  <circle cx="181" cy="246" r="13" fill="#f4f0e5"/>
+  <path d="M138 317c49 17 111 18 160 1" fill="none" stroke="#f4f0e5" stroke-width="11" stroke-linecap="round"/>
+  <path d="M335 106v84" stroke="#c54b1a" stroke-width="18" stroke-linecap="round"/>
+  <path d="m306 135 29-29 29 29" fill="none" stroke="#c54b1a" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

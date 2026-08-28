@@ -1,0 +1,37 @@
+{
+  "slug": "catch-photo-log",
+  "title": "Catch Photo Log",
+  "territory": "utilities",
+  "user": "An angler who takes a catch photo and needs a fast, private record of where/when it happened plus the tackle and setup facts useful on the next trip.",
+  "evidence": [
+    {
+      "url": "https://github.com/ed-p-may/lincolns-reel-records/issues/3",
+      "date": "2026-08-10",
+      "quote_or_summary": "A fishing-journal user explicitly requests that a selected catch photo populate time, date, and location from its metadata, falling back to manual entry only when absent."
+    },
+    {
+      "url": "https://outdoors.stackexchange.com/questions/30148/how-to-determine-how-much-weight-a-trotline-needs",
+      "date": "2025-04-09",
+      "quote_or_summary": "An angler trying a 100-metre trotline records line, snood, weight, target fish, lake, and fairway context while asking how to choose an anchor—trip setup is materially more than a catch count."
+    }
+  ],
+  "recurrence": "Two independent 2025–2026 fishing threads require structured field capture: photo facts for one and detailed rig/site context for the other. Severity is medium because remembered details are what make a trip learnable.",
+  "current_workaround": "Camera roll plus notes, spreadsheet, a social catch app, or re-entering GPS/date manually.",
+  "incumbents_and_gap": "Fishbrain and Anglr emphasize community, maps, and catch feeds; generic logbooks record catches. The gap is a local photo-first session card that preserves detailed setup without exposing a fishing spot.",
+  "smallest_useful_product": "Offline PWA that reads optional photo EXIF, then prompts for species, rig, bait/lure, water conditions, line/anchor setup, and private location precision; exports CSV/PDF.",
+  "success_measure": "At least 70% of 30 trial session records retain a photo-derived time/date plus three manually chosen setup fields, with median entry time under 90 seconds.",
+  "artifact_class": "pwa-offline",
+  "monetization": "one-time",
+  "constraints": "Location must be private and removable/rounded; never advise on catch limits or anchoring safety; EXIF access requires explicit browser permission and local processing.",
+  "est_build_effort": "S",
+  "why_distinct": "It is a private learning log for rig/context, not another public catch map or AI fish-ID wrapper.",
+  "confidence": 4,
+  "state": "RESEARCHED",
+  "non_goals": [
+    "Fish identification",
+    "Bite prediction",
+    "Social feed or public maps",
+    "Regulatory or anchoring safety advice"
+  ],
+  "source": "Factory work order catch-photo-log-build-1, 2026-08-28"
+}
