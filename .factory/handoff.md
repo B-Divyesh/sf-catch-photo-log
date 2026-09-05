@@ -4,6 +4,7 @@
 - Verdict: **FAIL**
 - Implementation reviewed: `343324676bdcc486ff2bab3b2b23f341110689a0`
 - Documentation reviewed before this report: `ab6ac19578294b36680dce12dbc34ddad23b8268`
+- Verification report commit: `51d2020c706fdef8d1cbd6d2c348f0ea2c4fe2d3`
 - Full report: `.factory/verification-2.md`
 
 No product code was changed. A clean checkout passed `npm ci`, all 3 unit tests, all 28 browser runs, all 12 declared claim commands, and `npm run build`. Live desktop and phone checks passed the primary record flow, isolated demo/reset/disposal, photo persistence, invalid and boundary inputs, malformed-backup recovery, keyboard and dialog focus, reduced motion, 44 px targets, route titles, legal pages, links, axe, and same-origin request checks. Live Lighthouse scored 100 Performance, 100 Accessibility, and 100 Best Practices with 1.2 s LCP.
