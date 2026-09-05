@@ -1,0 +1,20 @@
+{
+  "app": "catch-photo-log",
+  "version": 1,
+  "catches": [
+    {
+      "id": "imported-1",
+      "createdAt": "2026-09-05T01:00:00.000Z",
+      "updatedAt": "2026-09-05T01:00:00.000Z",
+      "caughtAt": "2026-09-05T01:00",
+      "dateSource": "manual",
+      "species": "Imported carp",
+      "rig": "Float rig",
+      "bait": "Corn",
+      "water": "Still",
+      "lineSetup": "6 lb mono",
+      "notes": "",
+      "location": { "mode": "removed" }
+    }
+  ]
+}

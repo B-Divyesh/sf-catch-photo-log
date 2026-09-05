@@ -1,11 +1,19 @@
 import type { CatchRecord } from './types';
 
-const DB_NAME = 'catch-photo-log';
+const REAL_DB_NAME = 'catch-photo-log';
 const STORE = 'catches';
+
+// Demo data must never share a database with a visitor's real log. The app
+// selects this before any read or write happens.
+let databaseName = REAL_DB_NAME;
+
+export function useStorageNamespace(namespace?: 'demo'): void {
+  databaseName = namespace === 'demo' ? `demo:${REAL_DB_NAME}` : REAL_DB_NAME;
+}
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(databaseName, 1);
     request.onupgradeneeded = () => {
       const database = request.result;
       if (!database.objectStoreNames.contains(STORE)) {
@@ -58,5 +66,15 @@ export async function replaceAllCatches(records: CatchRecord[]): Promise<void> {
     records.forEach((record) => store.put(record));
     transaction.oncomplete = () => { db.close(); resolve(); };
     transaction.onerror = () => reject(transaction.error ?? new Error('The backup was not imported.'));
+  });
+}
+
+export async function clearCatches(): Promise<void> {
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE, 'readwrite');
+    transaction.objectStore(STORE).clear();
+    transaction.oncomplete = () => { db.close(); resolve(); };
+    transaction.onerror = () => reject(transaction.error ?? new Error('The log could not be reset.'));
   });
 }

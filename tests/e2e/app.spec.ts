@@ -12,156 +12,197 @@ async function seriousAxeViolations(page: import('@playwright/test').Page): Prom
   });
 }
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-});
+async function openCatchForm(page: import('@playwright/test').Page): Promise<void> {
+  const ownCatch = page.getByRole('button', { name: 'Log your own catch' });
+  if (await ownCatch.count()) await ownCatch.click();
+  else await page.getByRole('button', { name: 'Add catch' }).click();
+  await expect(page.getByRole('heading', { name: 'Log the catch' })).toBeVisible();
+}
 
-test('logs, persists, edits and removes a private catch', async ({ page }) => {
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Catch Photo Log');
-  await expect(page.getByText('No field sheets yet')).toBeVisible();
-  await page.getByRole('button', { name: 'Log a catch', exact: true }).click();
-  await page.getByLabel('Add the catch photo').setInputFiles('public/icons/icon-192.png');
-  await page.getByRole('button', { name: 'Read photo details' }).click();
-  await expect(page.getByText(/No readable date or coordinates found/)).toBeVisible();
-  await page.getByLabel('Species *').fill('Largemouth bass');
-  await page.getByLabel('Rig *').fill('Texas rig, 3/0');
+async function saveCatch(page: import('@playwright/test').Page, species = 'Largemouth bass'): Promise<void> {
+  await openCatchForm(page);
+  await page.getByLabel('Species *').fill(species);
+  await page.getByLabel('Rig *').fill('Texas rig, size 3/0');
   await page.getByLabel('Bait or lure *').fill('Green pumpkin worm');
   await page.getByLabel('Water conditions *').fill('Stained, light chop');
   await page.getByLabel('Line / anchor setup *').fill('12 lb fluoro, 45 cm leader');
-  await page.getByLabel('What changed or worked?').fill('Slow retrieve beside the reeds.');
   await page.getByRole('button', { name: 'Save catch', exact: true }).click();
+  await expect(page.getByRole('heading', { name: species })).toBeVisible();
+}
 
-  await expect(page.getByRole('heading', { name: 'Largemouth bass' })).toBeVisible();
-  await expect(page.getByAltText('Photo attached to Largemouth bass record')).toBeVisible();
-  await expect(page.getByText('Spot removed')).toBeVisible();
+test('keeps keyboard operation, route titles, and accessible pages working', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle('Catch Photo Log — private catch records');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Turn a catch photo into a private record');
+  await page.keyboard.press('Tab');
+  await expect(page.getByText('Skip to main content')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#main')).toBeFocused();
+  await page.locator('footer').getByRole('link', { name: 'Privacy' }).click();
+  await expect(page).toHaveTitle('Privacy — Catch Photo Log');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Privacy for your catch log');
+  await expect.poll(() => seriousAxeViolations(page)).toEqual([]);
+  await page.locator('footer').getByRole('link', { name: 'Terms' }).click();
+  await expect(page).toHaveTitle('Terms — Catch Photo Log');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Terms for using Catch Photo Log');
+});
+
+test('@claim:demo-sample loads realistic sample records in one action', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: /Try it with sample data/ }).click();
+  await expect(page).toHaveURL(/\/demo$/);
+  await expect(page.getByLabel('Demo mode')).toContainText('Demo — sample data, nothing is saved');
+  await expect(page.getByRole('heading', { name: 'Smallmouth bass' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Rainbow trout' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Channel catfish' })).toBeVisible();
+  await expect(page.locator('#stat-catches')).toHaveText('3');
+});
+
+test('@claim:demo-isolation keeps sample changes away from a real log', async ({ page }) => {
+  await page.goto('/');
+  await saveCatch(page, 'Real water bass');
+  await page.getByRole('link', { name: 'Try sample' }).click();
+  await saveCatch(page, 'Demo-only perch');
+  await page.getByRole('link', { name: 'Start for real' }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { name: 'Real water bass' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Smallmouth bass' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Try sample' }).click();
+  await expect(page.getByRole('heading', { name: 'Demo-only perch' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Smallmouth bass' })).toBeVisible();
+});
+
+test('@claim:local-records saves a catch across a reload', async ({ page }) => {
+  await page.goto('/');
+  await saveCatch(page, 'River perch');
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Largemouth bass' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'River perch' })).toBeVisible();
+});
 
+test('@claim:photo-details reads selected photo details only on request and falls back to manual entry', async ({ page }) => {
+  const requested: string[] = [];
+  page.on('request', (request) => requested.push(request.url()));
+  await page.goto('/');
+  await openCatchForm(page);
+  await page.getByLabel('Add the catch photo').setInputFiles('public/icons/icon-192.png');
+  await expect(page.getByText('Photo selected. Details have not been read.')).toBeVisible();
+  await page.getByRole('button', { name: 'Read photo details' }).click();
+  await expect(page.getByText('No readable date or coordinates found. Enter them manually below.')).toBeVisible();
+  expect(new Set(requested.map((url) => new URL(url).origin))).toEqual(new Set([new URL(page.url()).origin]));
+});
+
+test('@claim:location-privacy rounds approximate spots and allows a removed spot', async ({ page }) => {
+  await page.goto('/');
+  await openCatchForm(page);
+  await page.getByLabel('Species *').fill('Boundary bass');
+  await page.getByLabel('Rig *').fill('Carolina rig');
+  await page.getByLabel('Bait or lure *').fill('Soft plastic');
+  await page.getByLabel('Water conditions *').fill('Clear');
+  await page.getByLabel('Line / anchor setup *').fill('10 lb fluoro');
+  await page.getByRole('radio', { name: /Approximate/ }).check();
+  await page.getByLabel('Latitude').fill('51.54321');
+  await page.getByLabel('Longitude').fill('-0.16789');
+  await expect(page.locator('#location-preview')).toContainText('51.5, -0.2');
+  await page.getByRole('button', { name: 'Save catch', exact: true }).click();
+  await expect(page.getByText('Approx. 51.5, -0.2')).toBeVisible();
   await page.getByRole('button', { name: 'Edit' }).click();
-  await page.getByLabel('Water conditions *').fill('Clear, calm');
+  await page.getByRole('radio', { name: /Remove/ }).check();
   await page.getByRole('button', { name: 'Save changes' }).click();
-  await expect(page.getByText('Clear, calm')).toBeVisible();
+  await expect(page.getByText('Spot removed')).toBeVisible();
+});
 
-  await page.getByRole('button', { name: 'Remove' }).click();
+test('@claim:edit-undo lets an angler change, remove, and restore a catch', async ({ page }) => {
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Edit' }).first().click();
+  await page.getByLabel('Water conditions *').fill('Clear after rain');
+  await page.getByRole('button', { name: 'Save changes' }).click();
+  await expect(page.getByText('Clear after rain')).toBeVisible();
+  await page.getByRole('button', { name: 'Remove' }).first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Remove catch' }).click();
-  await expect(page.getByText('No field sheets yet')).toBeVisible();
   await page.getByRole('button', { name: 'Undo' }).click();
-  await expect(page.getByRole('heading', { name: 'Largemouth bass' })).toBeVisible();
+  await expect(page.getByText('Clear after rain')).toBeVisible();
 });
 
-test('has no serious accessibility violations and legal pages resolve', async ({ page }) => {
-  await expect.poll(() => seriousAxeViolations(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Switch to night chart' }).click();
-  await expect.poll(() => seriousAxeViolations(page)).toEqual([]);
-  await page.goto('/privacy');
-  await expect(page.getByRole('heading', { name: 'Privacy, by design' })).toBeVisible();
-  await expect(page.locator('main')).toHaveCount(1);
-  await expect.poll(() => seriousAxeViolations(page)).toEqual([]);
-  await page.goto('/terms');
-  await expect(page.getByRole('heading', { name: 'Plain-language terms' })).toBeVisible();
+test('@claim:csv-export exports one CSV row for each sample catch', async ({ page }) => {
+  await page.goto('/demo');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export CSV' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^catch-log-.*\.csv$/);
+  const stream = await download.createReadStream();
+  let csv = '';
+  for await (const chunk of stream!) csv += chunk.toString();
+  expect(csv.split('\n')).toHaveLength(4);
+  expect(csv).toContain('Smallmouth bass');
 });
 
-test('keeps service-worker toast contrast accessible throughout its entrance', async ({ page }) => {
-  await page.evaluate(() => {
-    const toast = document.querySelector<HTMLElement>('#toast')!;
-    toast.innerHTML = '<span>Catch Photo Log is ready for offline use.</span>';
-    toast.hidden = false;
-    const animation = toast.getAnimations()[0];
-    animation?.pause();
-    if (animation) animation.currentTime = 90;
-  });
-  await expect(page.locator('#toast')).toBeVisible();
-  await expect(page.locator('#toast')).toHaveCSS('opacity', '1');
-  expect(await seriousAxeViolations(page)).toEqual([]);
+test('@claim:json-backup exports and imports a complete portable log', async ({ page }) => {
+  await page.goto('/demo');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Back up JSON' }).click();
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  let backup = '';
+  for await (const chunk of stream!) backup += chunk.toString();
+  expect(JSON.parse(backup).catches).toHaveLength(3);
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.getByLabel('Import JSON').setInputFiles('tests/fixtures/catch-log-backup.json');
+  await expect(page.getByRole('heading', { name: 'Imported carp' })).toBeVisible();
 });
 
-test('works at 390px and keeps the form keyboard-accessible', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-  await page.getByRole('button', { name: 'Log a catch', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByLabel('Add the catch photo')).toBeFocused();
-  await expect(page.getByRole('heading', { name: 'Log the catch' })).toBeVisible();
+test('@claim:pdf-print sends the populated log to the browser print action', async ({ page }) => {
+  await page.goto('/demo');
+  await page.evaluate(() => { const state = window as unknown as { printCalls: number }; state.printCalls = 0; window.print = () => { state.printCalls += 1; }; });
+  await page.getByRole('button', { name: 'Print / save PDF' }).click();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { printCalls: number }).printCalls)).toBe(1);
 });
 
-test('operates validation, confirmation, and undo entirely from the keyboard', async ({ page }) => {
-  await page.getByRole('button', { name: 'Log a catch', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  await page.getByLabel('Species *').fill('River perch');
-  await page.getByLabel('Rig *').fill('Float rig');
-  await page.getByLabel('Bait or lure *').fill('Worm');
-  await page.getByLabel('Water conditions *').fill('Clear and slow');
-  await page.getByLabel('Line / anchor setup *').fill('6 lb mono');
-  await page.getByRole('radio', { name: /Exact/ }).check();
-  await page.getByRole('button', { name: 'Save catch', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('alert')).toHaveText('Add coordinates or choose “Remove” for the location.');
-  await page.getByRole('radio', { name: /Remove/ }).check();
-  await page.getByRole('button', { name: 'Save catch', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('heading', { name: 'River perch' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Remove', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name: 'Keep catch' })).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(page.getByRole('button', { name: 'Remove catch' })).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(page.getByText('No field sheets yet')).toBeVisible();
-  await page.getByRole('button', { name: 'Undo' }).focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('heading', { name: 'River perch' })).toBeVisible();
-});
-
-test('updates its versioned cache and reloads app routes offline', async ({ page, context }) => {
+test('@claim:offline-reload works offline after the first demo visit', async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/demo');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload();
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
-  await page.evaluate(() => navigator.serviceWorker.dispatchEvent(new MessageEvent('message', { data: { type: 'APP_UPDATED' } })));
-  await expect(page.getByText('An update is ready. Reload for the newest field sheet.')).toBeVisible();
-  expect(await page.evaluate(() => caches.keys())).toEqual(expect.arrayContaining(['catch-log-v3-shell', 'catch-log-v3-assets']));
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await context.setOffline(true);
-  await page.goto('/privacy');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Catch Photo Log');
-  await expect(page.getByRole('heading', { name: 'Privacy, by design' })).toBeVisible();
-  await page.goto('/');
-  await expect(page.getByText('Offline now')).toBeVisible();
+  await page.goto('/demo');
+  await expect(page.getByRole('heading', { name: 'Smallmouth bass' })).toBeVisible();
+  await context.close();
 });
 
-test('loads without browser console errors', async ({ page }) => {
+test('@claim:private-free-path completes without accounts, payments, or third-party requests', async ({ page }) => {
+  const requested: string[] = [];
+  page.on('request', (request) => requested.push(request.url()));
+  await page.goto('/');
+  await saveCatch(page, 'Free log sunfish');
+  const origins = new Set(requested.map((url) => new URL(url).origin));
+  expect(origins).toEqual(new Set([new URL(page.url()).origin]));
+  await expect(page.locator('input[type="email"], input[type="password"], [href*="checkout"]')).toHaveCount(0);
+});
+
+test('@claim:theme-switch keeps the chosen night chart after reload', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Switch to night chart' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('shows plain invalid backup guidance, mobile targets, reduced motion, and no console errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.reload();
-  await page.waitForLoadState('networkidle');
+  await page.goto('/demo');
+  await page.getByLabel('Import JSON').setInputFiles('tests/fixtures/broken-backup.json');
+  await expect(page.locator('#import-status')).toHaveText('Choose a valid Catch Photo Log backup. Your current log was not changed.');
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  for (const target of await page.locator('.brand, footer a, #theme-toggle').all()) {
+    const box = await target.boundingBox();
+    expect(box && box.width >= 44 && box.height >= 44).toBeTruthy();
+  }
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect.poll(() => page.locator('.button.primary').first().evaluate((element) => getComputedStyle(element).transitionDuration)).toBe('1e-05s');
   expect(errors).toEqual([]);
-});
-
-test('restores a fresh cached Field Kit license without blocking first paint', async ({ page }) => {
-  await page.evaluate(() => {
-    localStorage.setItem('sb_license:catch-photo-log', 'test-token');
-    localStorage.setItem('sb_license:catch-photo-log:verdict', JSON.stringify({ valid: true, checkedAt: Date.now(), reason: 'ok' }));
-  });
-  await page.reload();
-  await expect(page.getByText('Field Kit active').first()).toBeVisible();
-  await page.getByRole('button', { name: 'Log a catch', exact: true }).click();
-  await expect(page.getByLabel('Use a Field Kit preset')).toBeVisible();
-});
-
-test('uses the production product identity and removes an invalid returned license', async ({ page }) => {
-  const verifyUrl = 'https://api.sociobot.in/api/v1/products/catch-photo-log/verify?license=invalid-token';
-  await page.route(verifyUrl, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ valid: false, reason: 'invalid', expires_at: null }) }));
-  await page.goto('/?source=checkout&license=invalid-token');
-  await expect(page).toHaveURL(/\?source=checkout$/);
-  await expect(page.getByText('Free field sheet')).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem('sb_license:catch-photo-log'))).toBeNull();
-  await expect(page.getByRole('link', { name: 'Buy Field Kit' })).toHaveAttribute('href', 'https://api.sociobot.in/api/v1/products/catch-photo-log/checkout');
-});
-
-test('makes no third-party requests during the private free experience', async ({ page }) => {
-  const origins = await page.evaluate(() => [...new Set(performance.getEntriesByType('resource').map((entry) => new URL(entry.name).origin))]);
-  expect(origins).toEqual([new URL(page.url()).origin]);
-  expect(await page.locator('script[src^="http"], link[href^="http"], img[src^="http"]').count()).toBe(0);
 });

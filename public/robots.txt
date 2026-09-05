@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://catch-photo-log.sociobot.in/sitemap.xml

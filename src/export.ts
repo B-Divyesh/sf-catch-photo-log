@@ -50,10 +50,15 @@ function dataUrlToBlob(value: string): Blob {
 }
 
 export function parseBackup(value: string): CatchRecord[] {
-  const parsed = JSON.parse(value) as { app?: string; version?: number; catches?: Array<CatchRecord & { photo?: Blob | string }> };
-  if (parsed.app !== 'catch-photo-log' || parsed.version !== 1 || !Array.isArray(parsed.catches)) throw new Error('Choose a Catch Photo Log JSON backup.');
-  return parsed.catches.map((record) => {
-    if (!record.id || !record.caughtAt || !record.species || !record.location?.mode) throw new Error('The backup contains an incomplete catch.');
-    return { ...record, photo: typeof record.photo === 'string' ? dataUrlToBlob(record.photo) : record.photo } as CatchRecord;
-  });
+  try {
+    const parsed = JSON.parse(value) as { app?: string; version?: number; catches?: Array<CatchRecord & { photo?: Blob | string }> };
+    if (parsed.app !== 'catch-photo-log' || parsed.version !== 1 || !Array.isArray(parsed.catches)) throw new Error('invalid');
+    return parsed.catches.map((record) => {
+      if (!record.id || !record.caughtAt || !record.species || !record.location?.mode) throw new Error('invalid');
+      return { ...record, photo: typeof record.photo === 'string' ? dataUrlToBlob(record.photo) : record.photo } as CatchRecord;
+    });
+  } catch {
+    // Do not expose parser internals to someone recovering data in the field.
+    throw new Error('Choose a valid Catch Photo Log backup. Your current log was not changed.');
+  }
 }

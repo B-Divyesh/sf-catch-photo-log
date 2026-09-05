@@ -1,58 +1,35 @@
 # Catch Photo Log
 
-Catch Photo Log is a private, photo-first fishing journal for anglers who want to remember what made a setup work without publishing a fishing spot. It is an installable offline PWA at [catch-photo-log.sociobot.in](https://catch-photo-log.sociobot.in).
+Catch Photo Log turns a catch photo into a private fishing setup record. It is for anglers who want to remember the rig, lure, water, and line setup without publishing a fishing spot.
 
-Choose a catch photo, optionally read its local JPEG date/GPS metadata, add species and setup facts, then choose whether the saved location is exact, rounded to roughly 11 km, or removed. Records and prepared photos live in IndexedDB on the device. There are no accounts, analytics, public maps, third-party fonts or runtime scripts.
+Start with [sample data](https://catch-photo-log.sociobot.in/demo), or log your own catch. The free app stores records in the browser, gives each catch exact, approximate, or removed location controls, and provides CSV, JSON, and browser print/PDF export. It does not identify fish, predict bites, publish maps, provide catch limits, or give anchoring advice.
 
-## What v1 includes
+Public product claims and their clean-sandbox commands are in [`.factory/claims.json`](.factory/claims.json). The isolated sample-data contract is in [`.factory/demo.md`](.factory/demo.md).
 
-- Opt-in, on-device JPEG EXIF date/time and GPS reading, with manual fallback
-- Structured species, rig, bait/lure, water, line/anchor and notes fields
-- Per-catch exact, approximate or removed coordinates, with a preview before save
-- Local create, edit, remove and undo workflows
-- Complete JSON backup/import, CSV export and print/save-as-PDF
-- Offline shell, install manifest, update/offline notices, day/night charts
-- ₹499 one-time optional Field Kit: unlimited photo attachments, reusable setup presets and lightweight species/bait patterns
-- Hosted Sociobot license checkout, daily verification cache and paste-to-restore flow
-- Plain-language `/privacy` and `/terms` routes
-
-The app does not identify fish, predict bites, provide catch limits, or give anchoring or water-safety advice.
-
-## Run and verify
+## Run and test
 
 Requires Node.js 20 or newer.
 
 ```sh
-npm install
-npm run dev
+npm ci
 npm test
 npm run build
 npm run preview
 ```
 
-`npm test` runs Vitest unit coverage and Playwright 1.58.2 browser tests. The factory image includes its Chromium binary; elsewhere, install it once with `npx playwright install chromium`.
+`npm test` runs the unit suite and Playwright 1.58.2 browser suite. Each public claim can also be run from a clean checkout using its command in `.factory/claims.json`. On machines without the bundled browser, run `npx playwright install chromium` once before browser tests.
 
-The reproducible deploy command is `npm run build`. Static output lands in `dist/`, with `dist/index.html` at its root. The host must serve `index.html` as the fallback for `/privacy` and `/terms` routes.
+`npm run build` produces `dist/` with `dist/index.html` at its root. Deploy that static directory with `public/staticwebapp.config.json`; it provides the valid app routes, response headers, and the styled 404 response.
 
-## Billing environments
+## Privacy and storage
 
-The Vite development server defaults to the factory’s test engine at `https://pilot-api.sociobot.in`; production builds default to `https://api.sociobot.in`. Either can be overridden explicitly:
+Real records and photos use this origin’s IndexedDB database. The demo uses a separate `demo:catch-photo-log` database and does not touch real records. JPEG date or coordinate details are read only after the user presses **Read photo details**. The app makes no account, payment, analytics, ad, social, map, font-CDN, or third-party runtime request on the free catch-log path.
 
-```sh
-VITE_BILLING_BASE_URL=https://api.sociobot.in npm run build
-```
+Export JSON backups before clearing browser data or moving devices. See [Privacy](https://catch-photo-log.sociobot.in/privacy) and [Terms](https://catch-photo-log.sociobot.in/terms).
 
-The checkout and verification URLs use the product slug `catch-photo-log`; no provider or product ID is embedded. Sociobot/Dodo is the merchant of record. The factory must enable that product in the selected billing environment before the buy link can accept purchases.
+## Design and assets
 
-## Storage and backups
-
-Catch records and photos are stored in the browser origin’s IndexedDB. Free use includes unlimited structured records and 12 photo attachments; Field Kit removes the attachment limit. CSV and PDF include field data; JSON is the complete portable backup, including photos. Import replaces the current local log only after confirmation.
-
-Clearing site data removes the log. Export JSON backups regularly, especially before changing devices or browsers.
-
-## Design and provenance
-
-The product-specific “waterproof blueprint field sheet” system and generated-asset provenance are documented in [`.factory/design.md`](.factory/design.md). The original source image and prompt sidecar are under `assets/src/`; optimized responsive WebP files ship from `public/assets/`.
+The product-specific waterproof blueprint field-sheet system and generated asset provenance are documented in [`.factory/design.md`](.factory/design.md). The responsive WebP hero and derived social crop are original product assets; no third-party assets or fonts load at runtime.
 
 ## License
 

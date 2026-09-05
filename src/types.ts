@@ -29,12 +29,3 @@ export interface ExifResult {
   lat?: number;
   lng?: number;
 }
-
-export interface SetupPreset {
-  id: string;
-  name: string;
-  rig: string;
-  bait: string;
-  water: string;
-  lineSetup: string;
-}

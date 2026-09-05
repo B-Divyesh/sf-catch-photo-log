@@ -18,7 +18,7 @@ Light “field sheet” is the default. Dark “night chart” is selected from 
 | `--muted` | `#526671` | `#A8BEC5` | secondary copy |
 | `--blueprint` | `#176B87` | `#69C6DC` | rules, links, focus |
 | `--grid` | `#C6DCE0` | `#1E4857` | drafting grid |
-| `--signal` | `#C54B1A` | `#FF8C55` | primary action / survey flag |
+| `--signal` | `#B43F14` | `#FF8C55` | primary action / survey flag |
 | `--signal-contrast` | `#FFFDF6` | `#071C27` | legible primary-action label |
 | `--success` | `#21663D` | `#7FCF96` | saved / local |
 | `--warning` | `#8A5A00` | `#FFD37A` | offline / missing metadata |
@@ -55,4 +55,4 @@ Prompt sheet:
 
 > Use case: stylized-concept. Asset type: wide PWA landing illustration. Primary request: an overhead technical field-journal study of a freshwater fish and a practical fishing rig arranged like evidence on a waterproof blueprint drafting sheet. Scene/backdrop: pale cream graph paper with subtle water rings and cyan construction lines. Subject: one anatomically believable generic freshwater fish, a simple lure, line spool, leader knots, small measurement arrows and registration marks. Style/medium: refined cyanotype ink drawing mixed with precise architectural drafting and a restrained screen-print texture. Composition: 3:2 landscape, fish across the lower left, rig details and spacious negative paper to the upper right; no border. Lighting/mood: flat daylight, calm, capable, private field notebook. Palette: deep navy ink, blueprint cyan, warm cream, one tiny burnt-orange survey marker. Constraints: no readable text, no numbers, no logos, no watermark, no people, no brands, no gore, no photorealism, no map pins, no UI screenshot.
 
-Generation provenance: created for Catch Photo Log on 2026-08-28 with the factory Azure image deployment through `/opt/fleet/lib/gen-image.sh`. Source PNG and prompt sidecar are retained under `assets/src/`; optimized WebP ships in `public/assets/`. Generated imagery is original to this product and disclosed in the footer.
+Generation provenance: created for Catch Photo Log on 2026-08-28 with the factory Azure image deployment through `/opt/fleet/lib/gen-image.sh`. Source PNG and prompt sidecar are retained under `assets/src/`; optimized WebP ships in `public/assets/`. `catch-blueprint-social.jpg` is a 1200×630 center crop derived locally from the same generated 1280px hero on 2026-09-05. Generated imagery is original to this product and disclosed in the footer.
