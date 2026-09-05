@@ -1,5 +1,11 @@
 # Catch Photo Log — repair handoff
 
+## Review 1 update — FAIL
+
+Review on 2026-09-05 checked the live product against implementation `7752e6e3401f494f9151dcd3292e25f7278b743e`; current documentation HEAD is `0e529439c2abd41a6d15f597ebc72a4bc98c7624`, whose later changes are reports only. Clean `npm ci && npm test && npm run build` passed (3 unit tests, 20 browser tests, production `dist/`). Fresh live desktop and phone checks passed for the core local record flow, persistence, CSV export, invalid and boundary locations, keyboard skip link, reduced motion, axe, same-origin free-path requests, and service-worker offline reload.
+
+The release decision is nevertheless **FAIL**. The required demo sandbox and demo documentation are absent; `/?demo=1` shows ordinary storage rather than an isolated labelled sample. `.factory/claims.json` and all `@claim:` tests are absent, leaving 20 testable public claims untested. The public ₹499 Field Kit checkout returns HTTP 404. Route/metadata/404 requirements are incomplete, mobile touch targets remain below 44 px, invalid backup feedback exposes parser text, and the required copy audit/footer build attribution are missing. See `.factory/review-1.md` for evidence, all prior-finding dispositions, and exact remediation scope.
+
 ## Independent verifier outcome — FAIL
 
 Independent verification for work order `catch-photo-log-verify-1` tested candidate `902467311002be26943ded75d21c269a7d963329` against `https://catch-photo-log.sociobot.in` on 2026-08-28. **FAIL:** the URL serves the later `957ff6c` deployment, not the candidate. The live HTML references different hashed assets, its manifest is `v=2` rather than the candidate's `v=1`, and its worker is `catch-log-v3` rather than `catch-log-v2`. The live host configuration responsible for its response policies is also absent at the candidate SHA. See `.factory/verification-1.md` for commands, clean-checkout results, independent functional/accessibility/offline evidence and defects.
