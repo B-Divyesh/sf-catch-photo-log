@@ -1,4 +1,23 @@
-# Catch Photo Log — repair 3 handoff
+# Catch Photo Log — verification 2 handoff
+
+- Independent verification completed: 2026-09-05
+- Verdict: **FAIL**
+- Implementation reviewed: `343324676bdcc486ff2bab3b2b23f341110689a0`
+- Documentation reviewed before this report: `ab6ac19578294b36680dce12dbc34ddad23b8268`
+- Full report: `.factory/verification-2.md`
+
+No product code was changed. A clean checkout passed `npm ci`, all 3 unit tests, all 28 browser runs, all 12 declared claim commands, and `npm run build`. Live desktop and phone checks passed the primary record flow, isolated demo/reset/disposal, photo persistence, invalid and boundary inputs, malformed-backup recovery, keyboard and dialog focus, reduced motion, 44 px targets, route titles, legal pages, links, axe, and same-origin request checks. Live Lighthouse scored 100 Performance, 100 Accessibility, and 100 Best Practices with 1.2 s LCP.
+
+Four findings remain:
+
+- High: after a controlled client visits an HTTP 404, the service worker stores that response as `/index.html`; the next offline `/demo` visit shows the 404 instead of the app.
+- Medium: four public promises lack complete claim coverage: exact coordinates, the numeric “about 11 km” statement, saved-photo persistence, and protection against a same-origin photo upload.
+- Low: the styled HTTP 404 omits the required shared navigation, skip link, complete footer, and route metadata.
+- Low: Privacy says only CSV or JSON can leave browser storage but does not name the visible print/PDF path.
+
+Evidence is under `/work/.evidence/catch-photo-log-verify-2/`. The external QA copies are `/work/.evidence/qa-report.md` and `/work/.evidence/qa-result.json`.
+
+## Previous repair 3 handoff
 
 Completed: 2026-09-05
 Implementation commit: `343324676bdcc486ff2bab3b2b23f341110689a0`
